@@ -1,0 +1,15 @@
+#!/bin/bash
+
+apt-get update
+
+apt-get install -y mysql-client
+
+apt-get install -y apache2
+
+apt-get install -y php7 libapache2-mod-php7
+apt-get install -y php7-mysql php7-curl php7-gd php7-intl php-pear php7-imagick php7-imap php7-mcrypt php7-memcache php7-ming php7-ps php7-pspell php7-recode php7-snmp php7-sqlite php7-tidy php7-xmlrpc php7-xsl
+
+/etc/init.d/apache2 restart
+
+rm -rf /var/www
+ln -fs /vagrant /var/www

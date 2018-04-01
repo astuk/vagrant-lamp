@@ -1,0 +1,5 @@
+#!/bin/bash
+
+apt-get update
+
+apt-get install -y vim git mlocate net-tools nc telnet

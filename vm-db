@@ -1,0 +1,8 @@
+#!/bin/bash
+
+apt-get update
+
+echo mysql-server-5.5 mysql-server/root_password password PASSWORD | debconf-set-selections
+echo mysql-server-5.5 mysql-server/root_password_again password PASSWORD | debconf-set-selections
+
+apt-get install -y mysql-common mysql-server mysql-client
