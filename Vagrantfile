@@ -14,7 +14,7 @@ Vagrant.configure("2") do |config|
     web.vm.provision "file", source: "~/vagrant/files/git-config", destination: "~/.gitconfig"
     web.vm.provision "shell", path: "https://raw.githubusercontent.com/astuk/vagrant-lamp/master/vm-web"
     web.vm.network "private_network", ip: "192.168.88.225"
-    vb.memory = "1024"
+    web.memory = "1024"
   end
   config.vm.define "db" do |db|
     db.vm.hostname = "db"
@@ -22,7 +22,7 @@ Vagrant.configure("2") do |config|
     db.vm.provision "file", source: "~/vagrant/files/git-config", destination: "~/.gitconfig"
     db.vm.provision "shell", path: "https://raw.githubusercontent.com/astuk/vagrant-lamp/master/vm-db"
     db.vm.network "private_network", ip: "192.168.88.226"
-    vb.memory = "1024"
+    db.memory = "1024"
   end
 
 end
