@@ -1,4 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Use single quotes instead of double quotes to make it work with special-character passwords
+PASSWORD='12345678'
+PROJECTFOLDER='myproject'
+
+# create project folder
+rm -rf /var/www
+ln -fs /vagrant /var/www
+sudo mkdir "/var/www/html"
+sudo mkdir "/var/www/html/${PROJECTFOLDER}"
 
 apt-get update
 
@@ -6,10 +15,42 @@ apt-get install -y mysql-client
 
 apt-get install -y apache2
 
-apt-get install -y php7 libapache2-mod-php7
-apt-get install -y php7-mysql php7-curl php7-gd php7-intl php-pear php7-imagick php7-imap php7-mcrypt php7-memcache php7-ming php7-ps php7-pspell php7-recode php7-snmp php7-sqlite php7-tidy php7-xmlrpc php7-xsl
+apt-get install -y php7.0 libapache2-mod-php7.0
+apt-get install -y php7.0-mysql php7.0-curl php7.0-gd php7.0-intl php-pear php7.0-imagick php7.0-imap php7.0-mcrypt php7.0-memcache php7.0-ming php7.0-ps php7.0-pspell php7.0-recode php7.0-snmp php7.0-sqlite php7.0-tidy php7.0-xmlrpc php7.0-xsl
 
 /etc/init.d/apache2 restart
 
-rm -rf /var/www
-ln -fs /vagrant /var/www
+# install phpmyadmin and give password(s) to installer
+# for simplicity I'm using the same password for mysql and phpmyadmin
+sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/dbconfig-install boolean true"
+sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/app-password-confirm password $PASSWORD"
+sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/admin-pass password $PASSWORD"
+sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/app-pass password $PASSWORD"
+sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2"
+sudo apt-get -y install phpmyadmin
+
+# setup hosts file
+VHOST=$(cat <<EOF
+<VirtualHost *:80>
+    DocumentRoot "/var/www/html/${PROJECTFOLDER}"
+    <Directory "/var/www/html/${PROJECTFOLDER}">
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+EOF
+)
+echo "${VHOST}" > /etc/apache2/sites-available/000-default.conf
+
+# enable mod_rewrite
+sudo a2enmod rewrite
+
+# restart apache
+service apache2 restart
+
+# install git
+sudo apt-get -y install git
+
+# install Composer
+curl -s https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
